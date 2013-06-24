@@ -28,9 +28,9 @@
 #define HORN_SOFTPIN 5
 
 #define STOP_SPEED 0
-#define SLOW_SPEED 80
-#define NORMAL_SPEED 140
-#define FAST_SPEED 200
+#define SLOW_SPEED 140
+#define NORMAL_SPEED 180
+#define FAST_SPEED 220
 #define ULTRAFAST_SPEED 255
 
 // initialize SPI LCD on pin 8
@@ -409,18 +409,34 @@ void loopVacuum(){
 // stops, reverse, turn and run
 void avoid_obstacle(int motor_on_obstacle_side){
   horn();
-  motorControl(M1|M2, STOP_SPEED); 
+  motorControl(M1|M2, STOP_SPEED);
+  switchLights(HIGH);
   int oposite_motor = (motor_on_obstacle_side&M1)?M2:M1;
-  delay(500);
-  motorControl(M1|M2, -SLOW_SPEED); 
-  delay(1000);
+  delay(200);
+  switchLights(LOW);
+  delay(200);
+  switchLights(HIGH);
+  motorControl(M1|M2, -NORMAL_SPEED); 
+  delay(200);
+  switchLights(LOW);
+  delay(200);
+  switchLights(HIGH);
+  delay(200);
+  switchLights(LOW);
+  delay(200);
+  switchLights(HIGH);
+  motorControl(M1|M2, STOP_SPEED); 
+  delay(200);
+  switchLights(LOW);
   motorControl(motor_on_obstacle_side, NORMAL_SPEED); 
-  motorControl(oposite_motor, -NORMAL_SPEED); 
-  delay(1500);
+  motorControl(oposite_motor, -NORMAL_SPEED);
+  delay(200);
+  switchLights(HIGH);
+  delay( random(100,1300) );
   motorControl(M1|M2, STOP_SPEED); 
   delay(500);
   motorControl(M1|M2, NORMAL_SPEED); 
-
+10,  switchLights(LOW);
 }
 
 void stopAll(){
