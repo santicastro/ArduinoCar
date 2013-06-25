@@ -263,7 +263,12 @@ void loop()
 {
   switch(read_buttons()){
   case btnUP:
-    selectedMenu = TOTAL_MENU_COUNT-1;
+    if(selectedMenu==0){
+      selectedMenu = TOTAL_MENU_COUNT-1;
+    }
+    else{
+      selectedMenu -= 1;
+    }
     drawMenu();
     waitButtonRelease();
     break;
@@ -436,7 +441,7 @@ void avoid_obstacle(int motor_on_obstacle_side){
   motorControl(M1|M2, STOP_SPEED); 
   delay(500);
   motorControl(M1|M2, NORMAL_SPEED); 
-10,  switchLights(LOW);
+  10,  switchLights(LOW);
 }
 
 void stopAll(){
@@ -471,6 +476,7 @@ void softwareOutputClear(int softwareOutputId){
   delayMicroseconds(1);
   digitalWrite(softwareOutputId, HIGH);
 }
+
 
 
 
