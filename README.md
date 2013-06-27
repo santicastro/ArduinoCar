@@ -1,7 +1,9 @@
 ArduinoCar
 ==========
 
-Firmware for Arduino based car. You can see a photo of the hardware on 'hardware' folder.
+Firmware for Arduino based car.
 
 Requirements: 
 Modified LiquidCrystal library to use over SPI (http://playground.arduino.cc/Main/LiquidCrystal)
+
+![capture](hardware/device.jpg)
