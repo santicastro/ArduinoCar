@@ -1,5 +1,6 @@
+#include "CustomLiquidCrystal.h"
+#include <Wire.h>
 #include <SPI.h>
-#include <LiquidCrystal.h>
 
 #define btnRIGHT 1
 #define btnUP    2
@@ -34,7 +35,7 @@
 #define ULTRAFAST_SPEED 255
 
 // initialize SPI LCD on pin 8
-LiquidCrystal lcd(8);
+CustomLiquidCrystal lcd(8);
 
 
 int SOFTWARE_OUTPUT_ID;
