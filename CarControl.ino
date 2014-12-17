@@ -17,6 +17,8 @@
 #define M1 1
 #define M2 2
 
+#define LED 9
+
 #define M1_SPEED_PIN 5
 #define M1_FRONT_SOFTPIN 2
 #define M1_BACK_SOFTPIN 3
@@ -54,6 +56,9 @@ void setup() {
   motorSetup();
   odometersSetup();
   drawMenu();
+  pinMode(LED, OUTPUT);
+  analogWrite(LED, 0);
+  Serial.println("Setup end...");
 }
 
 volatile signed int odo1_turns,odo2_turns;
@@ -260,8 +265,63 @@ void waitButtonRelease(){
     delay(50);
 }
 
+#define MAX_HEART_PERIOD 1500
+#define MIN_HEART_PERIOD 300
+#define MIN_UPDATE_PERIOD 20
+#define MIN_RATE_UPDATE_PERIOD 500
+#define MAX_HEART_LUM 230
+#define MIN_HEART_LUM 20
+#define MIN_MOVING_SPEED 50
+
+int lastHeartLumUpdate = 0;
+int lastHeartRateUpdate = 0;
+int heartDirection = 1;
+int currentHeartLumValue = MIN_HEART_LUM;
+float currentPeriod = MAX_HEART_PERIOD;
+
+void updateHeartLigth(){
+  int currentMillis = millis();
+  int difference = currentMillis - lastHeartLumUpdate;
+  if(difference > MIN_UPDATE_PERIOD){
+    lastHeartLumUpdate = currentMillis;
+    float delta = (difference / currentPeriod) * (MAX_HEART_LUM - MIN_HEART_LUM) * heartDirection;
+    Serial.println(delta);
+    currentHeartLumValue += delta;
+    while(currentHeartLumValue < MIN_HEART_LUM || currentHeartLumValue > MAX_HEART_LUM){
+      if(currentHeartLumValue < MIN_HEART_LUM){
+        currentHeartLumValue = MIN_HEART_LUM + (MIN_HEART_LUM - currentHeartLumValue);
+        heartDirection = 1;
+      }
+      if(currentHeartLumValue > MAX_HEART_LUM){
+        currentHeartLumValue = MAX_HEART_LUM - (currentHeartLumValue-MAX_HEART_LUM);
+        heartDirection = -1;
+      }
+    }
+   analogWrite(LED, currentHeartLumValue);
+  } 
+}
+
+void updateHeartRate(int currentSpeed){
+  int currentMillis = millis();
+  int difference = currentMillis - lastHeartRateUpdate;
+  if(difference > MIN_RATE_UPDATE_PERIOD){
+    lastHeartRateUpdate = currentMillis;
+    if( currentSpeed > MIN_MOVING_SPEED ){
+      currentPeriod = max(currentPeriod * (float)map(currentSpeed, MIN_MOVING_SPEED, 255, 100, 100 - 15/(1000/MIN_RATE_UPDATE_PERIOD)) / 100.0, MIN_HEART_PERIOD);
+    }else{
+      currentPeriod = min(currentPeriod * (1.00 + 0.05/(1000/MIN_RATE_UPDATE_PERIOD)), MAX_HEART_PERIOD);
+    }
+  }
+}
+
 void loop()
 {
+  updateHeartLigth();
+  if(millis()> 4000 && millis()<20000){
+    updateHeartRate(255);
+  }else{
+    updateHeartRate(0);
+  }
   switch(read_buttons()){
   case btnUP:
     if(selectedMenu==0){
